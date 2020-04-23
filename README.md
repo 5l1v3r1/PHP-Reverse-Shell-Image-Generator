@@ -1,7 +1,13 @@
-# PHP-Reverse-Shell-Image-Generato
+# PHP Reverse Shell Image Generator
 
 ### Generate PHP Reverse Shell Image (JPEG)  
-  
+
+A small Python3 script that create a meterpreter php reverse TCP shell.  
+Requires meterpreter listener for payload: payload/php/meterpreter/reverse_tcp
+
+
+### Usage  
+
 #### Required Arguments  
 **\-i,  \-\-image**           Image File to Convert (Required)  
 **\-a,  \-\-ipaddr**          Attacker IP (Required)  
